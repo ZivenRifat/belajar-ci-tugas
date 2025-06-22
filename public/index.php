@@ -50,7 +50,14 @@ require FCPATH . '../app/Config/Paths.php';
 
 $paths = new Config\Paths();
 
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
 // LOAD THE FRAMEWORK BOOTSTRAP FILE
 require $paths->systemDirectory . '/Boot.php';
+
+if (file_exists(dirname(__DIR__) . '/.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+    $dotenv->safeLoad();
+}
 
 exit(CodeIgniter\Boot::bootWeb($paths));
