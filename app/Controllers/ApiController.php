@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
+use Config\ApiConfig;
 
 use App\Models\UserModel;
 use App\Models\TransactionModel;
@@ -15,19 +16,15 @@ class ApiController extends ResourceController
     protected $user;
     protected $transaction;
     protected $transaction_detail;
+
     public function __construct()
     {
-        $this->apiKey = env('API_KEY');
+        $this->apiKey = config(ApiConfig::class)->apiKey;
         $this->user = new UserModel();
         $this->transaction = new TransactionModel();
         $this->transaction_detail = new TransactionDetailModel();
-        log_message('debug', 'API KEY dari env: ' . $this->apiKey);
     }
-    /**
-     * Return an array of resource objects, themselves in array format.
-     *
-     * @return ResponseInterface
-     */
+
     public function index()
     {
         $data = [
@@ -35,18 +32,24 @@ class ApiController extends ResourceController
             'status' => ["code" => 401, "description" => "Unauthorized"]
         ];
 
-        // Ambil header "Key" dari request (case-insensitive)
         $clientKey = $this->request->getHeaderLine('Key');
 
-        // Bandingkan dengan API key yang diatur di .env
         if ($clientKey === $this->apiKey) {
             $penjualan = $this->transaction->findAll();
 
             foreach ($penjualan as &$pj) {
-                $pj['details'] = $this->transaction_detail
-                    ->where('transaction_id', $pj['id'])
-                    ->findAll();
+                $details = $this->transaction_detail->where('transaction_id', $pj['id'])->findAll();
+
+                // Hitung total jumlah item dari detail transaksi
+                $totalJumlah = 0;
+                foreach ($details as $detail) {
+                    $totalJumlah += $detail['jumlah'];
+                }
+
+                $pj['jumlah_item'] = $totalJumlah; // <- Tambahkan ini
+                $pj['details'] = $details;
             }
+
 
             $data['status'] = ["code" => 200, "description" => "OK"];
             $data['results'] = $penjualan;

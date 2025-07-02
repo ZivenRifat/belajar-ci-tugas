@@ -17,17 +17,15 @@ History Transaksi Pembelian <strong><?= $username ?></strong>
             </tr>
         </thead>
         <tbody>
-            <?php
-            if (!empty($buy)) :
-                foreach ($buy as $index => $item) :
-            ?>
+            <?php if (!empty($buy)) : ?>
+                <?php foreach ($buy as $index => $item) : ?>
                     <tr>
-                        <th scope="row"><?php echo $index + 1 ?></th>
-                        <td><?php echo $item['id'] ?></td>
-                        <td><?php echo $item['created_at'] ?></td>
-                        <td><?php echo number_to_currency($item['total_harga'], 'IDR') ?></td>
-                        <td><?php echo $item['alamat'] ?></td>
-                        <td><?php echo ($item['status'] == "1") ? "Sudah Selesai" : "Belum Selesai" ?></td>
+                        <th scope="row"><?= $index + 1 ?></th>
+                        <td><?= esc($item['id']) ?></td>
+                        <td><?= esc($item['created_at']) ?></td>
+                        <td><?= number_to_currency($item['total_harga'], 'IDR') ?></td>
+                        <td><?= esc($item['alamat']) ?></td>
+                        <td><?= ($item['status'] == "1") ? "Sudah Selesai" : "Belum Selesai" ?></td>
                         <td>
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#detailModal-<?= $item['id'] ?>">
                                 Detail
@@ -43,33 +41,32 @@ History Transaksi Pembelian <strong><?= $username ?></strong>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <?php
-                                    if (!empty($product)) {
-                                        foreach ($product[$item['id']] as $index2 => $item2) : ?>
-                                            <?php echo $index2 + 1 . ")" ?>
-                                            <?php if ($item2['foto'] != '' and file_exists("img/" . $item2['foto'] . "")) : ?>
-                                                <img src="<?php echo base_url() . "img/" . $item2['foto'] ?>" width="100px">
-                                            <?php endif; ?>
-                                            <strong><?= $item2['nama'] ?></strong>
-                                            <?= number_to_currency($item2['harga'], 'IDR') ?>
-                                            <br>
-                                            <?= "(" . $item2['jumlah'] . " pcs)" ?><br>
-                                            <?= number_to_currency($item2['subtotal_harga'], 'IDR') ?>
+                                    <?php if (isset($product[$item['id']]) && !empty($product[$item['id']])) : ?>
+                                        <?php foreach ($product[$item['id']] as $index2 => $item2) : ?>
+                                            <div class="mb-2">
+                                                <?= $index2 + 1 ?>)
+                                                <?php if (!empty($item2['foto']) && file_exists("img/" . $item2['foto'])) : ?>
+                                                    <br>
+                                                    <img src="<?= base_url("img/" . $item2['foto']) ?>" width="100px"><br>
+                                                <?php endif; ?>
+                                                <strong><?= esc($item2['nama']) ?></strong><br>
+                                                <?= number_to_currency($item2['harga'], 'IDR') ?><br>
+                                                (<?= $item2['jumlah'] ?> pcs)<br>
+                                                <?= number_to_currency($item2['subtotal_harga'], 'IDR') ?>
+                                            </div>
                                             <hr>
-                                    <?php
-                                        endforeach;
-                                    }
-                                    ?>
-                                    Ongkir <?= number_to_currency($item['ongkir'], 'IDR') ?>
+                                        <?php endforeach; ?>
+                                        Ongkir: <?= number_to_currency($item['ongkir'], 'IDR') ?>
+                                    <?php else : ?>
+                                        <p>Tidak ada data item pada transaksi ini.</p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- Detail Modal End -->
-            <?php
-                endforeach;
-            endif;
-            ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
     </table>
     <!-- End Table with stripped rows -->

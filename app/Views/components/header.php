@@ -16,6 +16,15 @@
         </form>
     </div><!-- End Search Bar -->
 
+    <?php if (session()->has('diskon_nominal')): ?>
+        <div class="ms-3">
+            <div class="badge bg-success text-white p-2">
+                Diskon Hari Ini: Rp <?= number_format(session()->get('diskon_nominal'), 0, ',', '.') ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
 
@@ -214,7 +223,7 @@
                     </li>
 
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="logout">
+                        <a class="dropdown-item d-flex align-items-center" href="<?= base_url('logout') ?>">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
                         </a>
